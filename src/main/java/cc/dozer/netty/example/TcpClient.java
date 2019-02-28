@@ -10,9 +10,7 @@ import java.net.InetSocketAddress;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Dozer @ 5/24/15
- * mail@dozer.cc
- * http://www.dozer.cc
+ * Dozer @ 5/24/15 mail@dozer.cc http://www.dozer.cc
  */
 public class TcpClient {
     private volatile EventLoopGroup workerGroup;
@@ -24,10 +22,16 @@ public class TcpClient {
     private final String remoteHost;
 
     private final int remotePort;
+    private Channel chan;
 
     public TcpClient(String remoteHost, int remotePort) {
         this.remoteHost = remoteHost;
         this.remotePort = remotePort;
+    }
+
+    public void send()
+    {
+        chan.writeAndFlush("msg, promise");
     }
 
     public void close() {
@@ -48,7 +52,7 @@ public class TcpClient {
             @Override
             public void initChannel(SocketChannel ch) throws Exception {
                 ChannelPipeline pipeline = ch.pipeline();
-                pipeline.addFirst(new ChannelInboundHandlerAdapter() {
+                pipeline.addLast(new ChannelInboundHandlerAdapter() {
                     @Override
                     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
                         super.channelInactive(ctx);
@@ -56,7 +60,7 @@ public class TcpClient {
                     }
                 });
 
-                //todo: add more handler
+                // todo: add more handler
             }
         });
 
@@ -69,13 +73,15 @@ public class TcpClient {
         }
 
         ChannelFuture future = bootstrap.connect(new InetSocketAddress(remoteHost, remotePort));
-
+        chan = future.channel();
+        System.out.println("[doConnect] chan is : " + chan);
         future.addListener(new ChannelFutureListener() {
             public void operationComplete(ChannelFuture f) throws Exception {
                 if (f.isSuccess()) {
                     System.out.println("Started Tcp Client: " + getServerInfo());
                 } else {
                     System.out.println("Started Tcp Client Failed: " + getServerInfo());
+
                     f.channel().eventLoop().schedule(() -> doConnect(), 1, TimeUnit.SECONDS);
                 }
             }
@@ -83,8 +89,6 @@ public class TcpClient {
     }
 
     private String getServerInfo() {
-        return String.format("RemoteHost=%s RemotePort=%d",
-                remotePort,
-                remotePort);
+        return String.format("RemoteHost=%s RemotePort=%d", remotePort, remotePort);
     }
 }

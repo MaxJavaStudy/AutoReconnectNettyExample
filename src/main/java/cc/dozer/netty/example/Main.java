@@ -12,15 +12,16 @@ public class Main {
         TcpServer server = new TcpServer(8080);
         TcpClient client = new TcpClient("127.0.0.1", 8080);
 
-        System.out.println("==========Start Server First==========");
+       
         server.init();
         client.init();
+        client.send();
         Thread.sleep(2000);
 
         client.close();
         server.close();
         Thread.sleep(2000);
-
+/*
         System.out.println("==========Start Client First==========");
         client.init();
         server.init();
@@ -43,7 +44,7 @@ public class Main {
 
         client.close();
         server.close();
-
+*/
         System.in.read();
     }
 }

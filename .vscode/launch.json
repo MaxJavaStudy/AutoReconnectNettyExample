@@ -1,0 +1,11 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "CodeLens (Launch) - Main",
+            "request": "launch",
+            "mainClass": "cc.dozer.netty.example.Main",
+            "projectName": "netty.example"
+        }
+    ]
+}
